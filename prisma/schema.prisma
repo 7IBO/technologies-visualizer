@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Website {
+  id              String    @id @default(uuid()) @map("_id")
+  url             String    @unique
+  lastAnalyseDate DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
+  technologies WebsiteTechnology[]
+  analyzes     Analyze[]
+
+  @@map("websites")
+}
+
+model WebsiteTechnology {
+  id           String   @id @default(uuid()) @map("_id")
+  websiteId    String
+  technologyId String
+  versions     String[]
+
+  website    Website    @relation(fields: [websiteId], references: [id])
+  technology Technology @relation(fields: [technologyId], references: [id])
+
+  @@map("websiteTechnologies")
+}
+
+model Analyze {
+  id         String   @id @default(uuid()) @map("_id")
+  websiteId  String
+  analyzedAt DateTime @default(now())
+
+  website Website @relation(fields: [websiteId], references: [id])
+
+  technologies AnalyzeTechnology[]
+
+  @@map("analyzes")
+}
+
+model AnalyzeTechnology {
+  id           String   @id @default(uuid()) @map("_id")
+  analyzeId    String
+  technologyId String
+  versions     String[]
+
+  analyze    Analyze    @relation(fields: [analyzeId], references: [id])
+  technology Technology @relation(fields: [technologyId], references: [id])
+
+  @@map("analyzeTechnologies")
+}
+
+model Technology {
+  id          String   @id @default(uuid()) @map("_id")
+  name        String
+  slug        String   @unique
+  lastVersion String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  websites WebsiteTechnology[]
+  analyzes AnalyzeTechnology[]
+
+  @@map("technologies")
+}
