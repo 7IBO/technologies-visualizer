@@ -1,3 +1,4 @@
+import ToasterProvider from "@/providers/ToasterProvider";
 import "./globals.css";
 
 export const metadata = {
@@ -13,6 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-slate-800 flex justify-center items-center min-h-screen">
+        <ToasterProvider />
         {children}
       </body>
     </html>
